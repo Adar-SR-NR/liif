@@ -8,7 +8,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from models import register
-
+# from .dynamic_conv import conv3x3
+# from .dynet import DyNet2D
+from .dytest import DyNet2D
 
 def default_conv(in_channels, out_channels, kernel_size, bias=True):
     return nn.Conv2d(
@@ -90,7 +92,9 @@ url = {
 }
 
 class EDSR(nn.Module):
-    def __init__(self, args, conv=default_conv):
+    # def __init__(self, args, conv=default_conv):
+    # def __init__(self, args, conv=conv3x3):
+    def __init__(self, args, conv=DyNet2D):
         super(EDSR, self).__init__()
         self.args = args
         n_resblocks = args.n_resblocks

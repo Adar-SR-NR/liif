@@ -16,7 +16,8 @@ class LIIF(nn.Module):
         self.local_ensemble = local_ensemble
         self.feat_unfold = feat_unfold
         self.cell_decode = cell_decode
-
+        # self.quant = torch.ao.quantization.QuantStub()
+        # self.dequant = torch.ao.quantization.DeQuantStub()
         self.encoder = models.make(encoder_spec)
 
         if imnet_spec is not None:
@@ -106,5 +107,7 @@ class LIIF(nn.Module):
         return ret
 
     def forward(self, inp, coord, cell):
+        # x = self.quant(x)
         self.gen_feat(inp)
+        # x = self.dequant(x) 
         return self.query_rgb(coord, cell)
