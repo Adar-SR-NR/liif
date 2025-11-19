@@ -1,3 +1,7 @@
 __pycache__
 folders
 load
+save/
+*.png
+GEMINI.md
+.DS_Store
