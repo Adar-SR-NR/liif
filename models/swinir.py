@@ -665,6 +665,7 @@ class SwinIR(nn.Module):
         self.upscale = upscale
         self.upsampler = upsampler
         self.window_size = window_size
+        self.out_dim = embed_dim
 
         #####################################################################################################
         ################################### 1, shallow feature extraction ###################################
