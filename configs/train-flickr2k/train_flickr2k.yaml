@@ -2,9 +2,9 @@ train_dataset:
   dataset:
     name: image-folder
     args:
-      root_path: ./load/div2k/DIV2K_train_HR
-      repeat: 20
-      cache: in_memory
+      root_path: ./load/mix_train_HR
+      repeat: 5
+      cache: bin
   wrapper:
     name: sr-implicit-downsampled
     args:
