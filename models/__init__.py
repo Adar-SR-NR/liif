@@ -4,3 +4,4 @@ from . import mlp
 from . import liif, liif_softmax
 from . import misc
 from . import swinir 
+from . import arbrcan
