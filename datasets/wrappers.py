@@ -75,7 +75,9 @@ class SRImplicitPaired(Dataset):
             'inp': crop_lr,
             'coord': hr_coord,
             'cell': cell,
-            'gt': hr_rgb
+            'gt': hr_rgb,
+            'scale_h': s,
+            'scale_w': s
         }
 
 
@@ -153,7 +155,9 @@ class SRImplicitDownsampled(Dataset):
             'inp': crop_lr,
             'coord': hr_coord,
             'cell': cell,
-            'gt': hr_rgb
+            'gt': hr_rgb,
+            'scale_h': s,
+            'scale_w': s
         }
 
 
@@ -199,10 +203,15 @@ class SRImplicitUniformVaried(Dataset):
         cell = torch.ones_like(hr_coord)
         cell[:, 0] *= 2 / img_hr.shape[-2]
         cell[:, 1] *= 2 / img_hr.shape[-1]
+        
+        scale_h = img_hr.shape[-2] / img_lr.shape[-2]
+        scale_w = img_hr.shape[-1] / img_lr.shape[-1] 
 
         return {
             'inp': img_lr,
             'coord': hr_coord,
             'cell': cell,
-            'gt': hr_rgb
+            'gt': hr_rgb,
+            'scale_h': scale_h,
+            'scale_w': scale_w
         }

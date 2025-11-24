@@ -13,9 +13,9 @@ import models
 import utils
 
 
-def batched_predict(model, inp, coord, cell, bsize):
+def batched_predict(model, inp, coord, cell, bsize, scale=None, scale2=None):
     with torch.no_grad():
-        model.gen_feat(inp)
+        model.gen_feat(inp, scale=scale, scale2=scale2)
         n = coord.shape[1]
         ql = 0
         preds = []
@@ -60,15 +60,18 @@ def eval_psnr(loader, model, data_norm=None, eval_type=None, eval_bsize=None,
     pbar = tqdm(loader, leave=False, desc='val')
     for batch in pbar:
         for k, v in batch.items():
-            batch[k] = v.cuda()
+            if k != 'scale':
+                batch[k] = v.cuda()
 
         inp = (batch['inp'] - inp_sub) / inp_div
+        scale_h = batch.get('scale_h')
+        scale_w = batch.get('scale_w') 
         if eval_bsize is None:
             with torch.no_grad():
-                pred = model(inp, batch['coord'], batch['cell'])
+                pred = model(inp, batch['coord'], batch['cell'], scale=scale_h, scale2=scale_w)
         else:
             pred = batched_predict(model, inp,
-                batch['coord'], batch['cell'], eval_bsize)
+                batch['coord'], batch['cell'], eval_bsize, scale=scale_h, scale2=scale_w)
         pred = pred * gt_div + gt_sub
         pred.clamp_(0, 1)
 
