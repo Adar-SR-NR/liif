@@ -381,7 +381,7 @@ class ArbRCAN(nn.Module):
     
 @register('arbrcan')
 def make_arbrcan(n_resgroups=10, n_resblocks=20, n_feats=64, reduction=16,
-        scale1 = 1, scale2 = 1, no_upsampling=False, rgb_range=1,kernel_size = 3,
+        scale = 1, scale2 = 1, no_upsampling=False, rgb_range=1,kernel_size = 3,
         act = nn.ReLU(True), res_scale = 1):
     args = Namespace()
     args.n_resgroups = n_resgroups
@@ -390,7 +390,7 @@ def make_arbrcan(n_resgroups=10, n_resblocks=20, n_feats=64, reduction=16,
     args.reduction = reduction
     args.kernel_size = kernel_size
     args.act = act
-    args.scale1 = scale1
+    args.scale1 = scale
     args.scale2 = scale2
 
     # args.scale = [scale]

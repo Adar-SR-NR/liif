@@ -30,7 +30,11 @@ if __name__ == '__main__':
     cell = torch.ones_like(coord)
     cell[:, 0] *= 2 / h
     cell[:, 1] *= 2 / w
+    
+    scale_h = h / img.shape[-2]                                                 
+    scale_w = w / img.shape[-1]    
     pred = batched_predict(model, ((img - 0.5) / 0.5).cuda().unsqueeze(0),
-        coord.unsqueeze(0), cell.unsqueeze(0), bsize=30000)[0]
+        coord.unsqueeze(0), cell.unsqueeze(0), bsize=30000,
+        scale=scale_h, scale2=scale_w)[0]
     pred = (pred * 0.5 + 0.5).clamp(0, 1).view(h, w, 3).permute(2, 0, 1).cpu()
     transforms.ToPILImage()(pred).save(args.output)
