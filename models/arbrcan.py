@@ -279,12 +279,12 @@ class ArbRCAN(nn.Module):
     def __init__(self, args, conv=default_conv):
         super(ArbRCAN, self).__init__()
 
-        args.n_resgroups = n_resgroups
-        args.n_resblocks = n_resblocks
-        args.n_feats = n_feats
-        args.reduction = reduction
-        args.kernel_size = kernel_size
-        args.act = act
+        # args.n_resgroups = n_resgroups
+        # args.n_resblocks = n_resblocks
+        # args.n_feats = n_feats
+        # args.reduction = reduction
+        # args.kernel_size = kernel_size
+        # args.act = act
 
         # args.scale = [scale]
         self.no_upsampling = args.no_upsampling
