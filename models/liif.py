@@ -30,8 +30,14 @@ class LIIF(nn.Module):
         else:
             self.imnet = None
 
-    def gen_feat(self, inp):
-        self.feat = self.encoder(inp)
+    def gen_feat(self, inp, scale=None, scale2=None):
+        if scale is not None:
+            try:
+                self.feat = self.encoder(inp, scale, scale2)
+            except TypeError:
+                self.feat = self.encoder(inp)
+        else:
+            self.feat = self.encoder(inp)
         return self.feat
 
     def query_rgb(self, coord, cell=None):
@@ -105,6 +111,6 @@ class LIIF(nn.Module):
             ret = ret + pred * (area / tot_area).unsqueeze(-1)
         return ret
 
-    def forward(self, inp, coord, cell):
-        self.gen_feat(inp)
+    def forward(self, inp, coord, cell, scale=None, scale2=None):
+        self.gen_feat(inp, scale, scale2)
         return self.query_rgb(coord, cell)

@@ -296,6 +296,9 @@ class ArbRCAN(nn.Module):
         reduction = args.reduction 
         act = args.act
         self.n_resgroups = n_resgroups
+        
+        self.scale1 = args.scale1
+        self.scale2 = args.scale2
 
         # sub_mean & add_mean layers
         # if args.data_train == 'DIV2K':
@@ -344,9 +347,9 @@ class ArbRCAN(nn.Module):
         else:
             self.out_dim = args.n_colors
 
-    def set_scale(self, scale, scale2):
-        self.scale = scale
-        self.scale2 = scale2
+    # def set_scale(self, scale, scale2):
+    #     self.scale = scale
+    #     self.scale2 = scale2
 
     def forward(self, x):
         # head
@@ -359,7 +362,7 @@ class ArbRCAN(nn.Module):
             res = self.body[i](res)
             # scale-aware feature adaption
             if (i+1) % self.K == 0:
-                res = self.sa_adapt[i](res, self.scale, self.scale2)
+                res = self.sa_adapt[i](res, self.scale1, self.scale2)
 
         res = self.body[-1](res)
         res += x
@@ -367,7 +370,7 @@ class ArbRCAN(nn.Module):
         if self.no_upsampling:
             return res
         # scale-aware upsampling
-        res = self.sa_upsample(res, self.scale, self.scale2)
+        res = self.sa_upsample(res, self.scale1, self.scale2)
 
         # tail
         x = self.tail[1](res)
@@ -378,8 +381,8 @@ class ArbRCAN(nn.Module):
     
 @register('arbrcan')
 def make_arbrcan(n_resgroups=10, n_resblocks=20, n_feats=64, reduction=16,
-        scale=2, no_upsampling=False, rgb_range=1,kernel_size = 3,
-        act = nn.ReLU(True)):
+        scale1 = 1, scale2 = 1, no_upsampling=False, rgb_range=1,kernel_size = 3,
+        act = nn.ReLU(True), res_scale = 1):
     args = Namespace()
     args.n_resgroups = n_resgroups
     args.n_resblocks = n_resblocks
@@ -387,11 +390,13 @@ def make_arbrcan(n_resgroups=10, n_resblocks=20, n_feats=64, reduction=16,
     args.reduction = reduction
     args.kernel_size = kernel_size
     args.act = act
+    args.scale1 = scale1
+    args.scale2 = scale2
 
-    args.scale = [scale]
+    # args.scale = [scale]
     args.no_upsampling = no_upsampling
 
     args.rgb_range = rgb_range
-    args.res_scale = 1
+    args.res_scale = res_scale
     args.n_colors = 3
     return ArbRCAN(args)
