@@ -339,6 +339,10 @@ class ArbRCAN(nn.Module):
 
         # scale-aware upsampling layer
         self.sa_upsample = SA_upsample(64)
+        if args.no_upsampling:
+            self.out_dim = n_feats
+        else:
+            self.out_dim = args.n_colors
 
     def set_scale(self, scale, scale2):
         self.scale = scale
