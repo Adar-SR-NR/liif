@@ -46,7 +46,10 @@ def make_data_loader(spec, tag=''):
 
     log('{} dataset: size={}'.format(tag, len(dataset)))
     for k, v in dataset[0].items():
-        log('  {}: shape={}'.format(k, tuple(v.shape)))
+        if hasattr(v, 'shape'):
+            log('  {}: shape={}'.format(k, tuple(v.shape)))
+        else:
+            log('  {}: value={}'.format(k, v))
 
     loader = DataLoader(dataset, batch_size=spec['batch_size'],
         shuffle=(tag == 'train'), num_workers=8, pin_memory=True)
