@@ -1,0 +1,9 @@
+edsr-baseline：
+div2k-x2 result: 34.6398
+div2k-x3 result: 30.9354
+div2k-x4 result: 28.9715
+div2k-x6* result: 26.7262
+div2k-x12* result: 23.6919
+div2k-x18* result: 22.1512
+div2k-x24* result: 21.1601
+div2k-x30* result: 20.4702
