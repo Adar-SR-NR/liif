@@ -7,3 +7,13 @@ div2k-x12* result: 23.6919
 div2k-x18* result: 22.1512
 div2k-x24* result: 21.1601
 div2k-x30* result: 20.4702
+
+swinIR：
+div2k-x2 result: 34.7985
+div2k-x3 result: 31.0797
+div2k-x4 result: 29.1055
+div2k-x6* result: 26.8314
+div2k-x12* result: 23.7658
+div2k-x18* result: 22.2166
+div2k-x24* result: 21.2070
+div2k-x30* result: 20.5008
