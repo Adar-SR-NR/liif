@@ -173,6 +173,8 @@ class SA_adapt(nn.Module):
 
     def forward(self, x, scale, scale2):
         mask = self.mask(x)
+        if x.shape[-2:] != mask.shape[-2:]:
+            mask = F.interpolate(mask, size=x.shape[-2:], mode='bilinear', align_corners=False)
         adapted = self.adapt(x, scale, scale2)
 
         return x + adapted * mask
@@ -351,7 +353,12 @@ class ArbRCAN(nn.Module):
     #     self.scale = scale
     #     self.scale2 = scale2
 
-    def forward(self, x):
+    def forward(self, x, scale=None, scale2=None):
+        if scale is not None:
+            self.scale1 = scale
+        if scale2 is not None:
+            self.scale2 = scale2
+            
         # head
         x = self.sub_mean(x)
         x = self.head(x)
