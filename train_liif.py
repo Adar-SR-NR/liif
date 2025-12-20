@@ -56,10 +56,21 @@ def make_data_loader(spec, tag='', rank=0):
             else:
                 log('  {}: value={}'.format(k, v))
 
-    sampler = DistributedSampler(dataset, shuffle=(tag == 'train'))
+    if tag == 'train':
+        world_size = dist.get_world_size()
+        batch_size = spec['batch_size'] // world_size
+        if batch_size < 1:
+            batch_size = 1
+        
+        sampler = DistributedSampler(dataset, shuffle=True)
+        loader = DataLoader(dataset, batch_size=batch_size,
+            shuffle=False, num_workers=8, pin_memory=True, sampler=sampler)
+    else:
+        if rank != 0:
+            return None
+        loader = DataLoader(dataset, batch_size=spec['batch_size'],
+            shuffle=False, num_workers=8, pin_memory=True)
 
-    loader = DataLoader(dataset, batch_size=spec['batch_size'],
-        shuffle=False, num_workers=8, pin_memory=True, sampler=sampler)
     return loader
 
 
