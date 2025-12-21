@@ -213,6 +213,8 @@ class SA_conv(nn.Module):
             nn.init.uniform_(self.bias_pool, -bound, bound)
 
     def forward(self, x, scale, scale2):
+        b, c, h, w = x.size()
+
         # generate routing weights
         if isinstance(scale, torch.Tensor):
             if scale.dim() == 1:
@@ -226,19 +228,41 @@ class SA_conv(nn.Module):
 
         scale = torch.ones(1, 1).to(x.device) / scale
         scale2 = torch.ones(1, 1).to(x.device) / scale2
-        routing_weights = self.routing(torch.cat((scale, scale2), 1)).view(self.num_experts, 1, 1)
+        
+        # (B, num_experts)
+        routing_weights = self.routing(torch.cat((scale, scale2), 1))
 
         # fuse experts
-        fused_weight = (self.weight_pool.view(self.num_experts, -1, 1) * routing_weights).sum(0)
-        fused_weight = fused_weight.view(-1, self.channels_in, self.kernel_size, self.kernel_size)
+        # weight_pool: (num_experts, C_out, C_in, k, k)
+        # routing_weights: (B, num_experts)
+        
+        weights = self.weight_pool.unsqueeze(0) # (1, num_experts, C_out, C_in, k, k)
+        routing = routing_weights.view(b, self.num_experts, 1, 1, 1, 1)
+        
+        # (B, C_out, C_in, k, k)
+        fused_weight = (weights * routing).sum(1)
+        
+        # Reshape for grouped convolution (groups=b)
+        # Input: (1, B*C_in, H, W)
+        # Weights: (B*C_out, C_in, k, k)
+        # Output: (1, B*C_out, H, W)
+        
+        fused_weight = fused_weight.view(b * self.channels_out, self.channels_in, self.kernel_size, self.kernel_size)
+        x_grouped = x.view(1, b * self.channels_in, h, w)
 
         if self.bias:
-            fused_bias = torch.mm(routing_weights, self.bias_pool).view(-1)
+            # bias_pool: (num_experts, C_out)
+            bias_pool = self.bias_pool.unsqueeze(0) # (1, num_experts, C_out)
+            routing_bias = routing_weights.view(b, self.num_experts, 1)
+            fused_bias = (bias_pool * routing_bias).sum(1).view(-1) # (B*C_out)
         else:
             fused_bias = None
 
         # convolution
-        out = F.conv2d(x, fused_weight, fused_bias, stride=self.stride, padding=self.padding)
+        out = F.conv2d(x_grouped, fused_weight, fused_bias, stride=self.stride, padding=self.padding, groups=b)
+        
+        # Reshape back to (B, C_out, H, W)
+        out = out.view(b, self.channels_out, out.shape[2], out.shape[3])
 
         return out
 
