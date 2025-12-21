@@ -272,7 +272,7 @@ def grid_sample(x, offset, scale, scale2):
     b, _, h, w = x.size()
     h_coords = torch.arange(round(scale*h), dtype=torch.float64, device=x.device)
     w_coords = torch.arange(round(scale2*w), dtype=torch.float64, device=x.device)
-    grid_y, grid_x = torch.meshgrid(h_coords, w_coords)
+    grid_y, grid_x = torch.meshgrid(h_coords, w_coords, indexing='ij')
     grid = torch.stack((grid_x, grid_y), dim=-1)
     # grid = np.meshgrid(range(round(scale2*w)), range(round(scale*h)))
     # grid = np.stack(grid, axis=-1).astype(np.float64)
