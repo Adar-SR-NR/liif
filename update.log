@@ -1,0 +1,25 @@
+# Update Log - 2025/12/21
+
+## 修復 models/arbrcan.py 中的 SA_conv 模組
+
+### 1. 資料型態不匹配 (Dtype Mismatch)
+- **錯誤訊息**: `RuntimeError: mat1 and mat2 must have the same dtype, but got Double and Float`
+- **原因**: DataLoader 傳入的 `scale` 參數為 `float64` (Double)，而模型權重為 `float32` (Float)。
+- **修正**:
+  - 在 `forward` 方法中加入檢查，若 `scale` 為 Tensor 則強制轉換為 `float32`。
+  - 加入 `scale.view(-1, 1)` 以確保 1D Tensor 輸入能正確進行廣播運算。
+
+### 2. 批量訓練支援 (Batch Processing Support)
+- **錯誤訊息**: `RuntimeError: shape '[4, 1, 1]' is invalid for input of size 16`
+- **原因**: 原實作在融合權重時使用了 `.sum(0)`，導致 Batch 維度遺失，無法支援 Batch Size > 1 且每張圖片擁有不同 Scale 的情況。
+- **修正**:
+  - 改寫權重融合邏輯，保留 Batch 維度：`(weights * routing).sum(1)`。
+  - 引入 **分組卷積 (Grouped Convolution)** 技巧：
+    - 將輸入重塑為 `(1, B * C_in, H, W)`。
+    - 將融合後的權重重塑為 `(B * C_out, C_in, k, k)`。
+    - 使用 `F.conv2d(..., groups=B)` 實現每張樣本使用獨立權重的平行運算。
+
+## 其他修正
+- **檔案**: `models/arbrcan.py`, `utils.py`
+- **問題**: `UserWarning: torch.meshgrid: ...`
+- **修正**: 在所有 `torch.meshgrid` 呼叫中加入 `indexing='ij'` 參數以消除警告。
