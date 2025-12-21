@@ -214,6 +214,16 @@ class SA_conv(nn.Module):
 
     def forward(self, x, scale, scale2):
         # generate routing weights
+        if isinstance(scale, torch.Tensor):
+            if scale.dim() == 1:
+                scale = scale.view(-1, 1)
+            scale = scale.float()
+        
+        if isinstance(scale2, torch.Tensor):
+            if scale2.dim() == 1:
+                scale2 = scale2.view(-1, 1)
+            scale2 = scale2.float()
+
         scale = torch.ones(1, 1).to(x.device) / scale
         scale2 = torch.ones(1, 1).to(x.device) / scale2
         routing_weights = self.routing(torch.cat((scale, scale2), 1)).view(self.num_experts, 1, 1)
