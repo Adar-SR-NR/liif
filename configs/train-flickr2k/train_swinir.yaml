@@ -55,7 +55,7 @@ model:
       name: mlp
       args:
         out_dim: 3
-        hidden_list: [256, 256, 256, 256, 256, 256]
+        hidden_list: [512, 512, 512, 512]
 
 optimizer:
   name: adam
