@@ -19,6 +19,9 @@
         (resume): *.pth
 
         (epoch_val): ; (epoch_save):
+        
+    Command:
+        torchrun --nproc_per_node=4 train_liif.py --config ./configs/train-flickr2k/train_flickr2k_arbrcan-liif.yaml
 """
 
 import argparse
