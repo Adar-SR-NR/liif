@@ -158,7 +158,7 @@ def main(config_, save_path):
     # torchrun 會自動設定 LOCAL_RANK 等環境變數
     local_rank = int(os.environ["LOCAL_RANK"])
     torch.cuda.set_device(local_rank)
-    dist.init_process_group(backend='nccl')
+    dist.init_process_group(backend='gloo')
     
     config = config_
     
