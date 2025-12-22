@@ -67,7 +67,7 @@ def make_data_loader(spec, tag='', rank=0):
         
         sampler = DistributedSampler(dataset, shuffle=True)
         loader = DataLoader(dataset, batch_size=batch_size,
-            shuffle=False, num_workers=8, pin_memory=True, sampler=sampler)
+            shuffle=False, num_workers=4, pin_memory=True, sampler=sampler)
     else:
         if rank != 0:
             return None
@@ -188,6 +188,10 @@ def main(config_, save_path):
 
     # [修改] 使用 DDP 封裝模型
     model = DDP(model, device_ids=[local_rank], output_device=local_rank, find_unused_parameters=True)
+    
+    if local_rank == 0:
+        log('Dist init done. Starting training loop...')
+    dist.barrier()
 
     epoch_max = config['epoch_max']
     epoch_val = config.get('epoch_val')
