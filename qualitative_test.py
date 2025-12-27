@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # 1. Load Image (Use Original Resolution)
     # The requirement is "Use original resolution HR as input".
     img_hr_orig = Image.open(args.input).convert('RGB')
-    img_lr = img_hr_orig.resize((144, 144), Image.BICUBIC)
+    img_lr = img_hr_orig.resize((216, 144), Image.BICUBIC)
     
     # 2. Define Patch
     W, H = img_lr.size
