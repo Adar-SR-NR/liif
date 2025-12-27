@@ -65,7 +65,11 @@ if __name__ == '__main__':
     patch_bicubic = patch.resize((target_size, target_size), Image.BICUBIC)
     patch_bicubic.save(os.path.join(args.output_dir, '3_bicubic.png'))
 
-    # 6. Save Image 4: Model Upscale 30x
+    # 6. Save Image 4: The 48x48 Patch upscaled 30x using Nearest Neighbor (as HR reference)
+    patch_nearest_upscaled = patch.resize((target_size, target_size), Image.NEAREST)
+    patch_nearest_upscaled.save(os.path.join(args.output_dir, '4_patch_hr_upscaled.png'))
+
+    # 7. Save Image 5: Model Upscale 30x
     print(f"Loading model from {args.model}...")
     ckpt = torch.load(args.model)
     model = models.make(ckpt['model'], load_sd=True).cuda()
